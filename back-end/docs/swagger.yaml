@@ -1,0 +1,215 @@
+definitions:
+  models.Administrator:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Room:
+    properties:
+      createdAt:
+        type: string
+      free:
+        type: integer
+      id:
+        type: integer
+      location:
+        type: string
+      room_number:
+        type: string
+      seats:
+        items:
+          $ref: '#/definitions/models.Seat'
+        type: array
+      total:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  models.Seat:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      plug:
+        type: boolean
+      room_id:
+        type: integer
+      status:
+        type: integer
+      updatedAt:
+        type: string
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  models.User:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+host: 10.177.88.252:8800
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: iBooking back-end api.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: iBooking
+  version: "1.0"
+paths:
+  /admin/:
+    post:
+      consumes:
+      - application/json
+      description: create admin
+      parameters:
+      - description: admin 's username and password
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.Administrator'
+      produces:
+      - application/json
+      responses: {}
+      summary: create admin
+      tags:
+      - Admin
+  /admin/login/:
+    post:
+      consumes:
+      - application/json
+      description: admin login
+      parameters:
+      - description: Admin login with username and password
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.Administrator'
+      produces:
+      - application/json
+      responses: {}
+      summary: Admin Login
+      tags:
+      - Admin
+  /room/:
+    get:
+      consumes:
+      - application/json
+      description: get all room information
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get all room
+      tags:
+      - Room
+  /room/auth/:
+    get:
+      consumes:
+      - application/json
+      description: get room by id
+      parameters:
+      - description: Create Room by giving room information
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.Room'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get room
+      tags:
+      - Room
+  /room/auth/createRoom:
+    post:
+      consumes:
+      - application/json
+      description: create room
+      parameters:
+      - description: Create Room by giving room information
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.Room'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: create room
+      tags:
+      - Room
+  /user/:
+    post:
+      consumes:
+      - application/json
+      description: create user
+      parameters:
+      - description: user 's username and password
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses: {}
+      summary: create user
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: user login
+      parameters:
+      - description: user 's username and password
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses: {}
+      summary: user login
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

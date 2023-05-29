@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"github.com/amzcnx/iBooking/pkg/models"
 	"github.com/amzcnx/iBooking/pkg/utils"
-	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // CreateRoom godoc
@@ -31,7 +32,7 @@ func CreateRoom(c *gin.Context) {
 
 	// check time
 	openTime, closeTime := utils.Stoi(json["open_time"].(string), 8).(int8), utils.Stoi(json["close_time"].(string), 8).(int8)
-	if check(openTime, closeTime) {
+	if !check(openTime, closeTime) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "wrong time setting",
 		})
@@ -50,6 +51,7 @@ func CreateRoom(c *gin.Context) {
 		Free:   0,    //utils.Stoi(json["free"].(string), 16).(int16),
 		Usable: true, // default room is usable
 	}
+
 	if err := room.Create(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -73,10 +75,11 @@ func CreateRoom(c *gin.Context) {
 //	@Router			/room/ [get]
 func GetRoom(c *gin.Context) {
 	rooms, err := models.GetAllRooms()
-	fmt.Println(c.GetHeader("Authorization"))
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
+			"data":  rooms,
 		})
 		return
 	}
@@ -93,7 +96,7 @@ func GetRoom(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			admin	body	models.Room	true	"Create Room by giving room information"
+//	@Param			admin	path	string	true	"Create Room by giving room information"
 //
 //	@Router			/room/auth/ [get]
 func GetRoomByID(c *gin.Context) {
@@ -105,6 +108,7 @@ func GetRoomByID(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
+			"data":  room,
 		})
 		return
 	}
@@ -137,6 +141,7 @@ func DeleteRoom(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "roomID is required",
 		})
+		return
 	}
 	roomID := utils.Stoi(json["room_id"].(string), 64).(int64)
 	// delete the seat in the room
@@ -182,6 +187,7 @@ func UpdateRoom(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "roomID is required",
 		})
+		return
 	}
 
 	roomID := utils.Stoi(json["room_id"].(string), 64).(int64)

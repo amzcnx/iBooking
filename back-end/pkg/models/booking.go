@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -10,6 +9,7 @@ type Booking struct {
 	ID          int64 `gorm:"primaryKey" json:"id"`
 	UserID      int64
 	SeatID      int64
+	RoomID      int64
 	Duration    int8 // max 4h, unit hour
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
@@ -18,27 +18,29 @@ type Booking struct {
 }
 
 func (b *Booking) Create() error {
-	if ok := db.NewRecord(b); ok == true {
+	if db.NewRecord(b) {
 		return errors.New("booking already exists")
 	}
-	seat, err := GetSeatByID(b.SeatID)
+	room, err := GetRoomById(b.RoomID)
 	if err != nil {
 		return err
 	}
-	// seat is not free
-	if seat.Status != 1 {
-		return errors.New("seat is not free")
+	find := false
+	for i := 0; i < len(room.Seats); i++ {
+		if room.Seats[i].ID == b.SeatID {
+			find = true
+			if room.Seats[i].Status != 1 {
+				return errors.New("seat is not free")
+			}
+			room.Seats[i].Status = 2
+			break
+		}
 	}
-	room, err := GetRoomById(seat.RoomID)
-	if err != nil {
-		return err
+	if !find {
+		return errors.New("seat not found")
 	}
 	room.Free -= 1
 	if err = UpdateRoom(room); err != nil {
-		return err
-	}
-	seat.Status = 2
-	if err = UpdateSeat(seat); err != nil {
 		return err
 	}
 
@@ -53,12 +55,12 @@ func GetBookingByID(id int64) (*Booking, error) {
 	return &booking, nil
 }
 
-func GetBookingByUserID(id int64) ([]Booking, error) {
-	var bookings []Booking
-	if err := db.Model(&Booking{}).Where("user_id =?", id).Find(&bookings).Error; err != nil {
+func GetBookingByUserID(id int64) (*Booking, error) {
+	var booking Booking
+	if err := db.Model(&Booking{}).Where("user_id =?", id).Find(&booking).Error; err != nil {
 		return nil, err
 	}
-	return bookings, nil
+	return &booking, nil
 }
 
 func DeleteBooking(id int64) error {
@@ -66,24 +68,27 @@ func DeleteBooking(id int64) error {
 	if err := db.Model(&Booking{}).First(&booking).Error; err != nil {
 		return err
 	}
-	seat, err := GetSeatByID(booking.SeatID)
+	// change seat status and room information
+	room, err := GetRoomById(booking.RoomID)
 	if err != nil {
 		return err
 	}
-	// change seat status and room information
-	seat.Status = 1
-	room, err := GetRoomById(seat.RoomID)
-	if err != nil {
-		return err
+	find := false
+	for i := 0; i < len(room.Seats); i++ {
+		if room.Seats[i].ID == booking.SeatID {
+			find = true
+			room.Seats[i].Status = 1
+			break
+		}
+	}
+	if !find {
+		return errors.New("seat not found")
 	}
 	room.Free += 1
-	fmt.Println(room.Free)
 	if err = UpdateRoom(room); err != nil {
 		return err
 	}
-	if err = UpdateSeat(seat); err != nil {
-		return err
-	}
+
 	// delete booking record
 	return db.Model(&Booking{}).Where("id = ?", id).Delete(&Booking{}).Error
 }

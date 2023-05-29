@@ -9,7 +9,28 @@ import (
 	"net/http"
 )
 
+func Cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		method := c.Request.Method
+		origin := c.Request.Header.Get("Origin")
+		if origin != "" {
+			c.Header("Access-Control-Allow-Origin", "*") // 可将将 * 替换为指定的域名
+			c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
+			c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+			c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
+			c.Header("Access-Control-Allow-Credentials", "true")
+		}
+		if method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+		}
+		c.Next()
+	}
+}
+
 var RegisterBookingRoutes = func(router *gin.Engine) {
+
+	router.Use(Cors())
+
 	docs.SwaggerInfo.BasePath = ""
 	// swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -81,8 +102,9 @@ var RegisterBookingRoutes = func(router *gin.Engine) {
 		bookingRouter.POST("/", controllers.BookSeat)
 		bookingRouter.GET("/getBookingByID/:bookingID", controllers.GetBookingByID)
 		bookingRouter.GET("/getBookingByUserID/:userID", controllers.GetBookingByUserID)
-		bookingRouter.POST("/updateBooking", controllers.UpdateBooking) // update or attend
-		bookingRouter.POST("/deleteBooking", controllers.DeleteBooking) // cancel
+		bookingRouter.POST("/updateBooking", controllers.UpdateBooking)             // update or attend
+		bookingRouter.POST("/deleteBooking", controllers.DeleteBooking)             // cancel
+		bookingRouter.GET("/bookingHistory/:userID", controllers.GetBookingHistory) // history
 	}
 
 	//// notification management

@@ -79,6 +79,192 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/booking/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "book seat",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "book seat",
+                "parameters": [
+                    {
+                        "description": "Book a seat by giving seat_id and user_id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/booking/bookingHistory/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get booking history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "get booking history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "booking history",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/booking/deleteBooking": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete booking by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "delete booking",
+                "parameters": [
+                    {
+                        "description": "booking id",
+                        "name": "booking_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/booking/getBookingByID/{booking_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get booking by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "get booking by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "booking id",
+                        "name": "booking_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/booking/getBookingByUserID/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get booking by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "get booking by user ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/booking/updateBooking": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update booking , change isSigned",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "update booking",
+                "parameters": [
+                    {
+                        "description": "booking information",
+                        "name": "booking",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Booking"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/room/": {
             "get": {
                 "security": [
@@ -120,13 +306,11 @@ const docTemplate = `{
                 "summary": "get room",
                 "parameters": [
                     {
+                        "type": "string",
                         "description": "Create Room by giving room information",
                         "name": "admin",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Room"
-                        }
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -164,6 +348,242 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/room/auth/deleteRoom": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete room by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Room"
+                ],
+                "summary": "delete room",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Delete Room by giving room id",
+                        "name": "room_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/room/auth/updateRoom": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Room"
+                ],
+                "summary": "update room",
+                "parameters": [
+                    {
+                        "description": "Update Room by giving room id and room details",
+                        "name": "room",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Room"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/seat/": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get all seats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "get seat",
+                "responses": {}
+            }
+        },
+        "/seat/auth/createSeat": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "create seat",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "create seat",
+                "parameters": [
+                    {
+                        "description": "Create Seat by giving seat information",
+                        "name": "admin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Seat"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/seat/auth/deleteSeat": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete seat by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "delete seat",
+                "parameters": [
+                    {
+                        "description": "Delete Seat by giving seat id",
+                        "name": "seat_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/seat/auth/updateSeat": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update seat",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "update seat",
+                "parameters": [
+                    {
+                        "description": "Update Seat by giving seat information",
+                        "name": "admin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Seat"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/seat/getSeatByRoomID/{room_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get seat by room id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "get seat by room id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Get Seats by giving room id",
+                        "name": "room_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/seat/{seat_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get seat by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "get seat by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Get Seat by giving seat id",
+                        "name": "seat_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/user/": {
             "post": {
                 "description": "create user",
@@ -180,6 +600,137 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "user 's username and password",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/auth/deleteUser": {
+            "post": {
+                "description": "delete user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "delete user",
+                "parameters": [
+                    {
+                        "description": "user id",
+                        "name": "user_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/auth/getUserByID/{user_id}": {
+            "get": {
+                "description": "get user by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "get user by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/auth/getUserByUsername/{username}": {
+            "get": {
+                "description": "get user by username",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "get user by username",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/auth/password": {
+            "post": {
+                "description": "update password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "update password",
+                "parameters": [
+                    {
+                        "description": "userID and password",
+                        "name": "userinfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/auth/updateUser": {
+            "post": {
+                "description": "update user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "update user",
+                "parameters": [
+                    {
+                        "description": "user information",
                         "name": "admin",
                         "in": "body",
                         "required": true,
@@ -207,7 +758,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "user 's username and password",
-                        "name": "admin",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -240,9 +791,48 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Booking": {
+            "type": "object",
+            "properties": {
+                "bookingTime": {
+                    "description": "booking time, after it 15 min will auto cancel booking and free seat and notify student and record one default",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "max 4h, unit hour",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isSigned": {
+                    "description": "0 represent waiting, 1 represent attend, 2 represent delay",
+                    "type": "integer"
+                },
+                "roomID": {
+                    "type": "integer"
+                },
+                "seatID": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Room": {
             "type": "object",
             "properties": {
+                "close_time": {
+                    "description": "unit hour, 0-24, not earlier than open_time",
+                    "type": "integer"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -254,6 +844,13 @@ const docTemplate = `{
                 },
                 "location": {
                     "type": "string"
+                },
+                "open_time": {
+                    "description": "unit hour, 0-24",
+                    "type": "integer"
+                },
+                "overnight": {
+                    "type": "boolean"
                 },
                 "room_number": {
                     "type": "string"
@@ -269,6 +866,9 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                },
+                "usable": {
+                    "type": "boolean"
                 }
             }
         },
@@ -288,6 +888,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "status": {
+                    "description": "1 represent free, 2 represent reserved, 3 represent occupied, 4 represent under repair",
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -338,7 +939,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "10.177.88.252:8800",
+	Host:             "10.177.88.190:8800",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "iBooking",

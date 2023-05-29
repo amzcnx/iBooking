@@ -29,13 +29,13 @@ const (
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-//	@host	10.177.88.252:8800
+//	@host	10.177.88.190:8800
 
 // @securityDefinitions.apiKey	ApiKeyAuth
 // @in							header
 // @name						Authorization
 
-const ipAddr = "localhost"
+const ipAddr = "0.0.0.0" //"localhost"
 
 func main() {
 	router := gin.Default()

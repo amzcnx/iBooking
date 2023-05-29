@@ -1,9 +1,11 @@
 package models
 
 import (
+	"log"
+	"time"
+
 	"github.com/amzcnx/iBooking/pkg/config"
 	"github.com/jinzhu/gorm"
-	"time"
 )
 
 var db *gorm.DB
@@ -17,10 +19,14 @@ type Administrator struct {
 }
 
 func init() {
-	config.Connect()
+	if err := config.Connect(); err != nil {
+		log.Println(err)
+		return
+	}
 	db = config.GetDB()
 	db.AutoMigrate(&Administrator{})
 	db.AutoMigrate(&Booking{})
+	db.AutoMigrate(&BookingHistory{})
 	db.AutoMigrate(&Room{})
 	db.AutoMigrate(&Seat{})
 	db.AutoMigrate(&User{})

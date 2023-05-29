@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
-	"github.com/amzcnx/iBooking/pkg/models"
-	"github.com/jordan-wright/email"
 	"net/smtp"
+
+	"github.com/jordan-wright/email"
+
+	"github.com/amzcnx/iBooking/pkg/models"
 )
 
 func NotifyByEmail(userID int64, subject string, message string) error {
@@ -21,9 +22,9 @@ func NotifyByEmail(userID int64, subject string, message string) error {
 	e := email.NewEmail()
 	e.From = "iBooking <1514000750@qq.com>"
 	e.To = []string{emailAddress}
-	e.Subject = "iBooking " + subject
+	e.Subject = subject
 	e.Text = []byte(message)
-	fmt.Println(e)
+	// fmt.Println(e)
 	err = e.Send("smtp.qq.com:25", smtp.PlainAuth("", "1514000750@qq.com", "eptxbsxbdzryjgah", "smtp.qq.com"))
 	return err
 }

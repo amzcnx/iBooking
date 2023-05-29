@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
+	github.com/lib/pq v1.1.1
 	github.com/robfig/cron v1.2.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

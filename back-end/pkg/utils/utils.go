@@ -1,10 +1,11 @@
 package utils
 
 import (
-	"github.com/bwmarrin/snowflake"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strconv"
+
+	"github.com/bwmarrin/snowflake"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // GetID using snowflake algorithm to generate ID

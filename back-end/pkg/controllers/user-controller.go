@@ -1,13 +1,34 @@
 package controllers
 
 import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/amzcnx/iBooking/pkg/controllers/middlewares"
 	"github.com/amzcnx/iBooking/pkg/models"
 	"github.com/amzcnx/iBooking/pkg/utils"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
-	"net/http"
 )
+
+const (
+	userIDRequiredErrorMessage string = "userID is required"
+)
+
+func UpdateUserinfo(userinfo *models.UserInfo, info map[string]interface{}) {
+	if info["email"] != nil {
+		userinfo.Email = info["email"].(string)
+	}
+	if info["gender"] != nil {
+		userinfo.Gender = info["gender"].(string)
+	}
+	if info["number_defaults"] != nil {
+		userinfo.NumberDefaults = utils.Stoi(info["number_defaults"].(string), 32).(int32)
+	}
+	if info["accept_notification"] != nil {
+		userinfo.AcceptNotification = info["accept_notification"].(bool)
+	}
+}
 
 // CreateUser godoc
 //
@@ -52,20 +73,10 @@ func CreateUser(c *gin.Context) {
 		UserID:   user.ID,
 		Username: user.Username,
 	}
+
 	if json["userinfo"] != nil {
 		info := json["userinfo"].(map[string]interface{})
-		if info["email"] != nil {
-			userinfo.Email = info["email"].(string)
-		}
-		if info["gender"] != nil {
-			userinfo.Gender = info["gender"].(string)
-		}
-		if info["number_defaults"] != nil {
-			userinfo.NumberDefaults = utils.Stoi(info["number_defaults"].(string), 32).(int32)
-		}
-		if info["accept_notification"] != nil {
-			userinfo.AcceptNotification = info["accept_notification"].(bool)
-		}
+		UpdateUserinfo(&userinfo, info)
 		// log.Printf("userinfo: %v\n", userinfo)
 	}
 
@@ -107,6 +118,7 @@ func UserLogin(c *gin.Context) {
 		})
 		return
 	}
+
 	UserAuthMiddleware.LoginHandler(c)
 }
 
@@ -160,7 +172,7 @@ func DeleteUser(c *gin.Context) {
 	}
 	if json["user_id"] == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "userID is required",
+			"error": userIDRequiredErrorMessage,
 		})
 		return
 	}
@@ -203,7 +215,7 @@ func UpdateUser(c *gin.Context) {
 	}
 	if json["id"] == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "userID is required",
+			"error": userIDRequiredErrorMessage,
 		})
 		return
 	}
@@ -215,18 +227,8 @@ func UpdateUser(c *gin.Context) {
 		})
 		return
 	}
-	if json["email"] != nil {
-		userinfo.Email = json["email"].(string)
-	}
-	if json["gender"] != nil {
-		userinfo.Gender = json["gender"].(string)
-	}
-	if json["number_defaults"] != nil {
-		userinfo.NumberDefaults = utils.Stoi(json["number_defaults"].(string), 32).(int32)
-	}
-	if json["accept_notification"] != nil {
-		userinfo.AcceptNotification = json["accept_notification"].(bool)
-	}
+
+	UpdateUserinfo(userinfo, json)
 
 	if err := models.UpdateUserInfo(userinfo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -247,13 +249,13 @@ func UpdateUser(c *gin.Context) {
 // @Tags			User
 // @Accept			json
 // @Produce			json
-// @Param			user_id	body	string	true	"user id"
+// @Param			user_id	path	string	true	"user id"
 //
-// @Router			/user/auth/getUserByID/{user_id} [post]
+// @Router			/user/auth/getUserByID/{user_id} [get]
 func GetUserByID(c *gin.Context) {
 	if c.Param("userID") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "userID is required",
+			"error": userIDRequiredErrorMessage,
 		})
 		return
 	}
@@ -269,6 +271,7 @@ func GetUserByID(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
+			"data":  userinfo,
 		})
 		return
 	}
@@ -286,9 +289,9 @@ func GetUserByID(c *gin.Context) {
 // @Tags			User
 // @Accept			json
 // @Produce			json
-// @Param			username	body	string	true	"username"
+// @Param			username	path	string	true	"username"
 //
-// @Router			/user/auth/getUserByID/{username} [post]
+// @Router			/user/auth/getUserByUsername/{username} [get]
 func GetUserByUsername(c *gin.Context) {
 	if c.Param("username") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -308,6 +311,7 @@ func GetUserByUsername(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
+			"data":  userinfo,
 		})
 		return
 	}
@@ -327,7 +331,7 @@ func GetUserByUsername(c *gin.Context) {
 // @Produce			json
 // @Param			userinfo	body	string	true	"userID and password"
 //
-// @Router			/user/auth/password[post]
+// @Router			/user/auth/password [post]
 func UpdatePassword(c *gin.Context) {
 	json := make(map[string]interface{})
 	if err := c.BindJSON(&json); err != nil {
@@ -340,6 +344,7 @@ func UpdatePassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "user id is required",
 		})
+		return
 	}
 	userID := utils.Stoi(json["user_id"].(string), 64).(int64)
 	user, err := models.GetUserByID(userID)

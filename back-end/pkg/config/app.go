@@ -5,7 +5,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-const dbIp = "10.177.88.252"
+const dbIp = "10.177.88.190"
 
 var (
 	db *gorm.DB
@@ -16,12 +16,13 @@ const (
 )
 
 // Connect to the database
-func Connect() {
+func Connect() error {
 	d, err := gorm.Open("mysql", dsn)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	db = d
+	return nil
 }
 
 // GetDB return database

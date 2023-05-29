@@ -2,10 +2,14 @@ package controllers
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/lib/pq"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"github.com/amzcnx/iBooking/pkg/models"
 	"github.com/amzcnx/iBooking/pkg/utils"
-	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // CreateSeat godoc
@@ -56,12 +60,14 @@ func CreateSeat(c *gin.Context) {
 			X:      utils.Stoi(m["x"].(string), 8).(int8),
 			Y:      utils.Stoi(m["y"].(string), 8).(int8),
 			Status: utils.Stoi(m["status"].(string), 8).(int8),
+			S:      pq.ByteaArray{[]byte{123}},
 			Plug:   m["plug"].(bool),
 		}
 		if err := seat.Create(); err != nil {
 			errorMsg.WriteString(err.Error() + "\n")
 			continue
 		}
+		fmt.Println(seat)
 		Seats = append(Seats, *seat)
 	}
 	if errorMsg.Len() > 0 {
@@ -159,6 +165,7 @@ func GetSeat(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
+			"data":  seats,
 		})
 		return
 	}
@@ -214,7 +221,7 @@ func DeleteSeat(c *gin.Context) {
 //	@Security		ApiKeyAuth
 //	@Param			seat_id 	path	string	 true	"Get Seat by giving seat id"
 //
-//	@Router			/seat/{seat_id} [post]
+//	@Router			/seat/{seat_id} [get]
 func GetSeatByID(c *gin.Context) {
 	if c.Param("seatID") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -227,6 +234,7 @@ func GetSeatByID(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
+			"data":  seat,
 		})
 		return
 	}
@@ -243,9 +251,9 @@ func GetSeatByID(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			room_id 	body	string	 true	"Get Seats by giving room id"
+//	@Param			room_id 	path	string	 true	"Get Seats by giving room id"
 //
-//	@Router			/seat/getSeatByRoomID/{room_id} [post]
+//	@Router			/seat/getSeatByRoomID/{room_id} [get]
 func GetSeatByRoomID(c *gin.Context) {
 	if c.Param("roomID") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -254,15 +262,18 @@ func GetSeatByRoomID(c *gin.Context) {
 		return
 	}
 	roomID := utils.Stoi(c.Param("roomID"), 64).(int64)
-	seats, err := models.GetSeatByRoomID(roomID)
+	room, err := models.GetRoomById(roomID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
+			"data":  room.Seats,
 		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "get seats ok",
-		"data":    seats,
+		"message":       "get seats ok",
+		"data":          room.Seats,
+		"room_location": room.Location,
+		"room_number":   room.RoomNumber,
 	})
 }

@@ -12,8 +12,36 @@ definitions:
       username:
         type: string
     type: object
+  models.Booking:
+    properties:
+      bookingTime:
+        description: booking time, after it 15 min will auto cancel booking and free
+          seat and notify student and record one default
+        type: string
+      createdAt:
+        type: string
+      duration:
+        description: max 4h, unit hour
+        type: integer
+      id:
+        type: integer
+      isSigned:
+        description: 0 represent waiting, 1 represent attend, 2 represent delay
+        type: integer
+      roomID:
+        type: integer
+      seatID:
+        type: integer
+      updatedAt:
+        type: string
+      userID:
+        type: integer
+    type: object
   models.Room:
     properties:
+      close_time:
+        description: unit hour, 0-24, not earlier than open_time
+        type: integer
       createdAt:
         type: string
       free:
@@ -22,6 +50,11 @@ definitions:
         type: integer
       location:
         type: string
+      open_time:
+        description: unit hour, 0-24
+        type: integer
+      overnight:
+        type: boolean
       room_number:
         type: string
       seats:
@@ -32,6 +65,8 @@ definitions:
         type: integer
       updatedAt:
         type: string
+      usable:
+        type: boolean
     type: object
   models.Seat:
     properties:
@@ -44,6 +79,8 @@ definitions:
       room_id:
         type: integer
       status:
+        description: 1 represent free, 2 represent reserved, 3 represent occupied,
+          4 represent under repair
         type: integer
       updatedAt:
         type: string
@@ -68,7 +105,7 @@ definitions:
     - password
     - username
     type: object
-host: 10.177.88.252:8800
+host: 10.177.88.190:8800
 info:
   contact:
     email: support@swagger.io
@@ -118,6 +155,123 @@ paths:
       summary: Admin Login
       tags:
       - Admin
+  /booking/:
+    post:
+      consumes:
+      - application/json
+      description: book seat
+      parameters:
+      - description: Book a seat by giving seat_id and user_id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: book seat
+      tags:
+      - Booking
+  /booking/bookingHistory/{userID}:
+    get:
+      consumes:
+      - application/json
+      description: get booking history
+      parameters:
+      - description: booking history
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get booking history
+      tags:
+      - Booking
+  /booking/deleteBooking:
+    post:
+      consumes:
+      - application/json
+      description: delete booking by ID
+      parameters:
+      - description: booking id
+        in: body
+        name: booking_id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: delete booking
+      tags:
+      - Booking
+  /booking/getBookingByID/{booking_id}:
+    get:
+      consumes:
+      - application/json
+      description: get booking by ID
+      parameters:
+      - description: booking id
+        in: path
+        name: booking_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get booking by ID
+      tags:
+      - Booking
+  /booking/getBookingByUserID/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: get booking by user ID
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get booking by user ID
+      tags:
+      - Booking
+  /booking/updateBooking:
+    post:
+      consumes:
+      - application/json
+      description: update booking , change isSigned
+      parameters:
+      - description: booking information
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/models.Booking'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: update booking
+      tags:
+      - Booking
   /room/:
     get:
       consumes:
@@ -138,11 +292,10 @@ paths:
       description: get room by id
       parameters:
       - description: Create Room by giving room information
-        in: body
+        in: path
         name: admin
         required: true
-        schema:
-          $ref: '#/definitions/models.Room'
+        type: string
       produces:
       - application/json
       responses: {}
@@ -171,6 +324,154 @@ paths:
       summary: create room
       tags:
       - Room
+  /room/auth/deleteRoom:
+    post:
+      consumes:
+      - application/json
+      description: delete room by id
+      parameters:
+      - description: Delete Room by giving room id
+        in: path
+        name: room_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: delete room
+      tags:
+      - Room
+  /room/auth/updateRoom:
+    post:
+      consumes:
+      - application/json
+      description: update room
+      parameters:
+      - description: Update Room by giving room id and room details
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/models.Room'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: update room
+      tags:
+      - Room
+  /seat/:
+    get:
+      description: get all seats
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get seat
+      tags:
+      - Seat
+  /seat/{seat_id}:
+    get:
+      consumes:
+      - application/json
+      description: get seat by id
+      parameters:
+      - description: Get Seat by giving seat id
+        in: path
+        name: seat_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get seat by id
+      tags:
+      - Seat
+  /seat/auth/createSeat:
+    post:
+      consumes:
+      - application/json
+      description: create seat
+      parameters:
+      - description: Create Seat by giving seat information
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.Seat'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: create seat
+      tags:
+      - Seat
+  /seat/auth/deleteSeat:
+    post:
+      consumes:
+      - application/json
+      description: delete seat by id
+      parameters:
+      - description: Delete Seat by giving seat id
+        in: body
+        name: seat_id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: delete seat
+      tags:
+      - Seat
+  /seat/auth/updateSeat:
+    post:
+      consumes:
+      - application/json
+      description: update seat
+      parameters:
+      - description: Update Seat by giving seat information
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.Seat'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: update seat
+      tags:
+      - Seat
+  /seat/getSeatByRoomID/{room_id}:
+    get:
+      consumes:
+      - application/json
+      description: get seat by room id
+      parameters:
+      - description: Get Seats by giving room id
+        in: path
+        name: room_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: get seat by room id
+      tags:
+      - Seat
   /user/:
     post:
       consumes:
@@ -179,7 +480,7 @@ paths:
       parameters:
       - description: user 's username and password
         in: body
-        name: admin
+        name: user
         required: true
         schema:
           $ref: '#/definitions/models.User'
@@ -187,6 +488,94 @@ paths:
       - application/json
       responses: {}
       summary: create user
+      tags:
+      - User
+  /user/auth/deleteUser:
+    post:
+      consumes:
+      - application/json
+      description: delete user
+      parameters:
+      - description: user id
+        in: body
+        name: user_id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: delete user
+      tags:
+      - User
+  /user/auth/getUserByID/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: get user by id
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: get user by id
+      tags:
+      - User
+  /user/auth/getUserByUsername/{username}:
+    get:
+      consumes:
+      - application/json
+      description: get user by username
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: get user by username
+      tags:
+      - User
+  /user/auth/password:
+    post:
+      consumes:
+      - application/json
+      description: update password
+      parameters:
+      - description: userID and password
+        in: body
+        name: userinfo
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: update password
+      tags:
+      - User
+  /user/auth/updateUser:
+    post:
+      consumes:
+      - application/json
+      description: update user
+      parameters:
+      - description: user information
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses: {}
+      summary: update user
       tags:
       - User
   /user/login:
@@ -197,7 +586,7 @@ paths:
       parameters:
       - description: user 's username and password
         in: body
-        name: admin
+        name: user
         required: true
         schema:
           $ref: '#/definitions/models.User'

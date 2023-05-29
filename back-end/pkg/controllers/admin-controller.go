@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/amzcnx/iBooking/pkg/controllers/middlewares"
 	"github.com/amzcnx/iBooking/pkg/models"
 	"github.com/amzcnx/iBooking/pkg/utils"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
-	"net/http"
 )
 
 // CreatAdmin godoc
@@ -46,8 +48,6 @@ func CreateAdmin(c *gin.Context) {
 		Username: json["username"].(string),
 		Password: string(hash),
 	}
-
-	// log.Printf("password: %v\n", string(hash))
 
 	if err := admin.Create(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

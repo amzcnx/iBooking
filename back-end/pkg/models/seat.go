@@ -1,22 +1,23 @@
 package models
 
 import (
+	"github.com/lib/pq"
 	"time"
 )
 
 type Seat struct {
-	ID        int64 `gorm:"primaryKey" json:"id"`
-	RoomID    int64 `json:"room_id"`
-	X         int8  `json:"x"`
-	Y         int8  `json:"y"`
-	Status    int8  `json:"status"` // 1 represent free, 2 represent reserved, 3 represent occupied, 4 represent under repair
-	Plug      bool  `json:"plug"`
+	ID        int64         `gorm:"primaryKey" json:"id"`
+	RoomID    int64         `json:"room_id"`
+	X         int8          `json:"x"`
+	Y         int8          `json:"y"`
+	Status    int8          `json:"status"`        // 0 represent not usable, 1 represent free, 2 represent reserved, 3 represent occupied, 4 represent under repair
+	S         pq.ByteaArray `gorm:"type:byte[][]"` // test status  3*24, 最多预约3天内座位
+	Plug      bool          `json:"plug"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 func (s *Seat) Create() error {
-	// db.NewRecord(s)
 	room, err := GetRoomById(s.RoomID)
 	if err != nil {
 		return err

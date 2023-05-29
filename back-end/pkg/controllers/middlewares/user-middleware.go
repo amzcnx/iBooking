@@ -1,11 +1,13 @@
 package middlewares
 
 import (
-	"github.com/amzcnx/iBooking/pkg/models"
+	"time"
+
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"time"
+
+	"github.com/amzcnx/iBooking/pkg/models"
 )
 
 var identityKey = "username"

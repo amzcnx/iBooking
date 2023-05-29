@@ -1,19 +1,23 @@
 package middlewares
 
 import (
-	"github.com/amzcnx/iBooking/pkg/models"
+	"time"
+
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"time"
+
+	"github.com/amzcnx/iBooking/pkg/models"
 )
+
+const TokenTimeout = 24
 
 func GenerateAdminAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:            "identity",
 		SigningAlgorithm: "HS256",
 		Key:              []byte("secret key"),
-		Timeout:          24 * time.Hour,
+		Timeout:          TokenTimeout * time.Hour,
 		MaxRefresh:       time.Hour,
 		IdentityKey:      identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
